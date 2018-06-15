@@ -40,10 +40,10 @@ type mobile_sensing_data struct {
 	Magnetometer_z        float32 `json:"Magnetometer_z"`
 }
 
-var mobile_sensing_data_csv_col = []string{"ID", "DeviceName", "Timestamp", "Compass", "Accelerometer_x", "Accelerometer_y", "Accelerometer_z", "Gyroscope_x", "Gyroscope_y", "Gyroscope_z", "Magnetometer_x", "Magnetometer_y", "Magnetometer_z"}
+var mobile_sensing_data_csv_col = []string{"ID", "DeviceName", "Timestamp", "Compass", "Accelerometer_x", "Accelerometer_y", "Accelerometer_z", "LinearAccelerometer_x", "LinearAccelerometer_y", "LinearAccelerometer_z", "Gyroscope_x", "Gyroscope_y", "Gyroscope_z", "Magnetometer_x", "Magnetometer_y", "Magnetometer_z"}
 
 func mobile_sensing_data_to_str(data mobile_sensing_data) []string {
-	return []string{data.ID, data.DeviceName, fmt.Sprintf("%.6f", data.Timestamp), fmt.Sprintf("%.6f", data.Compass), fmt.Sprintf("%.6f", data.Accelerometer_x), fmt.Sprintf("%.6f", data.Accelerometer_y), fmt.Sprintf("%.6f", data.Accelerometer_z), fmt.Sprintf("%.6f", data.Gyroscope_x), fmt.Sprintf("%.6f", data.Gyroscope_y), fmt.Sprintf("%.6f", data.Gyroscope_z), fmt.Sprintf("%.6f", data.Magnetometer_x), fmt.Sprintf("%.6f", data.Magnetometer_y), fmt.Sprintf("%.6f", data.Magnetometer_z)}
+	return []string{data.ID, data.DeviceName, fmt.Sprintf("%.6f", data.Timestamp), fmt.Sprintf("%.6f", data.Compass), fmt.Sprintf("%.6f", data.Accelerometer_x), fmt.Sprintf("%.6f", data.Accelerometer_y), fmt.Sprintf("%.6f", data.Accelerometer_z), fmt.Sprintf("%.6f", data.LinearAccelerometer_x), fmt.Sprintf("%.6f", data.LinearAccelerometer_y), fmt.Sprintf("%.6f", data.LinearAccelerometer_z), fmt.Sprintf("%.6f", data.Gyroscope_x), fmt.Sprintf("%.6f", data.Gyroscope_y), fmt.Sprintf("%.6f", data.Gyroscope_z), fmt.Sprintf("%.6f", data.Magnetometer_x), fmt.Sprintf("%.6f", data.Magnetometer_y), fmt.Sprintf("%.6f", data.Magnetometer_z)}
 }
 
 var m sync.Mutex
