@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"sync"
 	"time"
 
@@ -23,25 +22,28 @@ var upgrader = websocket.Upgrader{
 }
 
 type mobile_sensing_data struct {
-	ID              string  `json:"ID"`
-	DeviceName      string  `json:"DeviceName"`
-	Timestamp       int64   `json:"Timestamp"`
-	Compass         float32 `json:"Compass"`
-	Accelerometer_x float32 `json:"Accelerometer_x"`
-	Accelerometer_y float32 `json:"Accelerometer_y"`
-	Accelerometer_z float32 `json:"Accelerometer_z"`
-	Gyroscope_x     float32 `json:"Gyroscope_x"`
-	Gyroscope_y     float32 `json:"Gyroscope_y"`
-	Gyroscope_z     float32 `json:"Gyroscope_z"`
-	Magnetometer_x  float32 `json:"Magnetometer_x"`
-	Magnetometer_y  float32 `json:"Magnetometer_y"`
-	Magnetometer_z  float32 `json:"Magnetometer_z"`
+	ID                    string  `json:"ID"`
+	DeviceName            string  `json:"DeviceName"`
+	Timestamp             float64 `json:"Timestamp"`
+	Compass               float32 `json:"Compass"`
+	Accelerometer_x       float32 `json:"Accelerometer_x"`
+	Accelerometer_y       float32 `json:"Accelerometer_y"`
+	Accelerometer_z       float32 `json:"Accelerometer_z"`
+	LinearAccelerometer_x float32 `json:"LinearAccelerometer_x"`
+	LinearAccelerometer_y float32 `json:"LinearAccelerometer_y"`
+	LinearAccelerometer_z float32 `json:"LinearAccelerometer_z"`
+	Gyroscope_x           float32 `json:"Gyroscope_x"`
+	Gyroscope_y           float32 `json:"Gyroscope_y"`
+	Gyroscope_z           float32 `json:"Gyroscope_z"`
+	Magnetometer_x        float32 `json:"Magnetometer_x"`
+	Magnetometer_y        float32 `json:"Magnetometer_y"`
+	Magnetometer_z        float32 `json:"Magnetometer_z"`
 }
 
 var mobile_sensing_data_csv_col = []string{"ID", "DeviceName", "Timestamp", "Compass", "Accelerometer_x", "Accelerometer_y", "Accelerometer_z", "Gyroscope_x", "Gyroscope_y", "Gyroscope_z", "Magnetometer_x", "Magnetometer_y", "Magnetometer_z"}
 
 func mobile_sensing_data_to_str(data mobile_sensing_data) []string {
-	return []string{data.ID, data.DeviceName, strconv.FormatInt(data.Timestamp, 10), fmt.Sprintf("%.6f", data.Compass), fmt.Sprintf("%.6f", data.Accelerometer_x), fmt.Sprintf("%.6f", data.Accelerometer_y), fmt.Sprintf("%.6f", data.Accelerometer_z), fmt.Sprintf("%.6f", data.Gyroscope_x), fmt.Sprintf("%.6f", data.Gyroscope_y), fmt.Sprintf("%.6f", data.Gyroscope_z), fmt.Sprintf("%.6f", data.Magnetometer_x), fmt.Sprintf("%.6f", data.Magnetometer_y), fmt.Sprintf("%.6f", data.Magnetometer_z)}
+	return []string{data.ID, data.DeviceName, fmt.Sprintf("%.6f", data.Timestamp), fmt.Sprintf("%.6f", data.Compass), fmt.Sprintf("%.6f", data.Accelerometer_x), fmt.Sprintf("%.6f", data.Accelerometer_y), fmt.Sprintf("%.6f", data.Accelerometer_z), fmt.Sprintf("%.6f", data.Gyroscope_x), fmt.Sprintf("%.6f", data.Gyroscope_y), fmt.Sprintf("%.6f", data.Gyroscope_z), fmt.Sprintf("%.6f", data.Magnetometer_x), fmt.Sprintf("%.6f", data.Magnetometer_y), fmt.Sprintf("%.6f", data.Magnetometer_z)}
 }
 
 var m sync.Mutex
@@ -73,7 +75,7 @@ func index() http.Handler {
 	})
 }
 
-var num = 0
+var num_entries = 0
 
 func mobile_sensing(logger *log.Logger, writer *csv.Writer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -83,16 +85,18 @@ func mobile_sensing(logger *log.Logger, writer *csv.Writer) http.Handler {
 		if err != nil {
 			panic(err)
 		}
+
+		num_entries += 1
+		data_str := mobile_sensing_data_to_str(data)
+		logger.Println("mobile", num_entries, "-", data_str)
+
 		m.Lock()
 		defer m.Unlock()
-		err = writer.Write(mobile_sensing_data_to_str(data))
+		err = writer.Write(data_str)
 		if err != nil {
-			logger.Println("here!!!!", err)
+			logger.Println("Write to csv error", err)
 		}
 		writer.Flush()
-		num += 1
-		logger.Println("mobile", num, "-", data)
-		logger.Println(mobile_sensing_data_to_str(data))
 	})
 }
 
